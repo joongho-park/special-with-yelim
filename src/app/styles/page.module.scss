@@ -213,9 +213,9 @@ $container-max-width: 768px;
   .date {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 12px;
 
-    font-size: 14px;
+    font-size: 24px;
     text-align: center;
   }
 
@@ -242,6 +242,15 @@ $container-max-width: 768px;
       font-size: 22px;
       letter-spacing: 6px;
     }
+
+    .date {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      font-size: 18px;
+      text-align: center;
+    }
   }
 
   // Mobile responsive (~ 768px)
@@ -266,6 +275,15 @@ $container-max-width: 768px;
       gap: 12px;
       font-size: 18px;
       letter-spacing: 4px;
+    }
+
+    .date {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      font-size: 14px;
+      text-align: center;
     }
   }
 }
