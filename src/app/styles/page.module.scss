@@ -42,7 +42,7 @@ $ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 $transition-base: 0.3s $ease-smooth;
 
 // Layout
-$container-max-width: 480px;
+$container-max-width: 768px;
 
 // ============================================
 // Base Container (480px Mobile-First)
@@ -81,7 +81,7 @@ $container-max-width: 480px;
   }
 
   // Desktop/Tablet: limit width and add shadow for card effect
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     max-width: $container-max-width;
     box-shadow: 0 0 40px rgba($color-text-primary, 0.08);
 
@@ -110,7 +110,7 @@ $container-max-width: 480px;
   z-index: 9999;
   animation: fadeOut 0.6s ease-out 1.4s forwards;
 
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     max-width: $container-max-width;
   }
 }
@@ -210,18 +210,52 @@ $container-max-width: 480px;
     letter-spacing: 8px;
   }
 
-  // Mobile responsive
-  @media (max-width: 480px) {
-    padding: 200px 0;
+  .date {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    font-size: 14px;
+    text-align: center;
+  }
+
+  // Tablet responsive (768px ~ 1199px)
+  @media (min-width: 769px) and (max-width: 1199px) {
+    padding: 180px 0;
 
     .title {
-      font-size: 32px;
+      font-size: 45px;
+      letter-spacing: 9px;
+    }
+
+    .invitationContent {
+      gap: 48px;
+      font-size: 26px;
+
+      .invitationMessage {
+        gap: 10px;
+      }
+    }
+
+    .from {
+      gap: 14px;
+      font-size: 22px;
+      letter-spacing: 6px;
+    }
+  }
+
+  // Mobile responsive (~ 768px)
+  @media (max-width: 768px) {
+    padding: 150px 0 140px;
+
+    .title {
+      font-size: 30px;
       letter-spacing: 6px;
     }
 
     .invitationContent {
       gap: 32px;
-      font-size: 18px;
+      font-size: 15px;
 
       .invitationMessage {
         gap: 8px;
@@ -230,7 +264,7 @@ $container-max-width: 480px;
 
     .from {
       gap: 12px;
-      font-size: 16px;
+      font-size: 18px;
       letter-spacing: 4px;
     }
   }
@@ -439,7 +473,7 @@ $container-max-width: 480px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .mapContainer {
     height: 300px;
   }

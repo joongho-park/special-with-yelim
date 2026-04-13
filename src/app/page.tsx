@@ -163,6 +163,10 @@ export default function Main() {
                 <b>이창준</b>&middot;<b>유혜영</b> 의 차녀 <b>이예림</b>
               </div>
             </div>
+            <div className={styles.date}>
+              <div>2026년 5월 2일 토요일 오전 11시 30분</div>
+              <div>장소: 쿠우쿠우</div>
+            </div>
           </div>
           <div className={styles.footer}>
             <div className={styles.footerContent}>
