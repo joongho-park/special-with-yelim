@@ -102,7 +102,7 @@ export default function Main() {
         const position = new window.kakao.maps.LatLng(36.7783897, 126.4565724);
         const options = {
           center: position,
-          level: 3,
+          level: 4,
         };
 
         const map = new window.kakao.maps.Map(mapRef.current, options);
@@ -150,26 +150,26 @@ export default function Main() {
             <div className={styles.title}>결혼합니다</div>
             <div className={styles.invitationContent}>
               <div className={styles.invitationMessage}>
-                <div>화려한 예식 대신 가족들과의 소중한 식사로</div>
-                <div>부부로서의 첫걸음을 내딛기로 하였습니다.</div>
-                <div>직접 모시지 못한 송구한 마음을 담아</div>
-                <div>따로 정성껏 식사 자리를 준비했사오니,</div>
-                <div>귀한 걸음 하시어 저희의 시작을 격려해 주시면</div>
-                <div>더할 나위 없는 기쁨이겠습니다.</div>
+                <div className={styles.textLine}>화려한 예식 대신 가족들과의 소중한 식사로</div>
+                <div className={styles.textLine}>부부로서의 첫걸음을 내딛기로 하였습니다.</div>
+                <div className={styles.textLine}>직접 모시지 못한 송구한 마음을 담아</div>
+                <div className={styles.textLine}>따로 정성껏 식사 자리를 준비했사오니,</div>
+                <div className={styles.textLine}>귀한 걸음 하시어 저희의 시작을 격려해 주시면</div>
+                <div className={styles.textLine}>더할 나위 없는 기쁨이겠습니다.</div>
               </div>
               <div className={styles.invitationMessage}></div>
             </div>
             <div className={styles.from}>
-              <div>
+              <div className={styles.textLine}>
                 <b>박양열</b>&middot;<b>강현숙</b> 의 장남 <b>박중호</b>
               </div>
-              <div>
+              <div className={styles.textLine}>
                 <b>이창준</b>&middot;<b>유혜영</b> 의 차녀 <b>이예림</b>
               </div>
             </div>
             <div className={styles.date}>
-              <div>2026년 5월 2일 토요일 오전 11시 30분</div>
-              <div>장소: 쿠우쿠우</div>
+              <div className={styles.textLine}>2026년 5월 2일 토요일 오전 11시 30분</div>
+              <div className={styles.textLine}>장소: 쿠우쿠우</div>
             </div>
           </div>
           <div className={styles.footer}>
