@@ -205,14 +205,24 @@ export default function Main() {
               <Typewriter
                 onInit={(typewriter) => {
                   typewriter
-                    .typeString('<span class="names">박중호</span>')
+                    .typeString('<span class="names">박중호</span><br/>')
                     .pauseFor(200)
-                    .typeString('<br/><span class="names">')
+                    .typeString('<span class="names">')
                     .typeString("&")
                     .typeString("</span><br/>")
                     .pauseFor(200)
                     .typeString('<span class="names">이예림</span>')
-                    .pauseFor(500)
+                    .pauseFor(200)
+                    .callFunction(() => {
+                      // 커서 숨기기
+                      const cursor = document.querySelector(
+                        `.${styles.typewriterText} .Typewriter__cursor`,
+                      ) as HTMLElement;
+                      if (cursor) {
+                        cursor.style.display = "none";
+                      }
+                    })
+                    .pauseFor(300)
                     .callFunction(() => {
                       handleTypingComplete();
                     })
