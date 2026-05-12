@@ -16,7 +16,7 @@ const nextConfig = (phase: string): NextConfig => {
     sassOptions: {
       additionalData: `$basePath: "${isDev ? "" : prodBasePath.replace(/\/+$/, "")}";`,
     },
-    allowedDevOrigins: ["192.168.1.155"],
+    allowedDevOrigins: ["192.168.0.11"],
   };
 };
 

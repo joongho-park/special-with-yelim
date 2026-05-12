@@ -108,37 +108,55 @@ $container-max-width: 768px;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeOut 0.6s ease-out 1.4s forwards;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.6s ease-out;
+
+  &.fadeOut {
+    opacity: 0;
+    pointer-events: none;
+  }
 
   @media (max-width: 768px) {
     max-width: $container-max-width;
   }
 }
 
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    pointer-events: none;
-  }
-}
-
 .loadingContent {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.loadingImage {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-  animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
+.typewriterText {
+  font-size: 32px;
+  font-weight: 600;
+  color: $color-text-primary;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Typewriter 컴포넌트의 기본 스타일 오버라이드
+  :global(.Typewriter) {
+    display: inline-block;
   }
-  50% {
-    transform: translateY(-10px);
+  
+  :global(.Typewriter__wrapper) {
+    font-family: inherit;
+    color: inherit;
+    text-align: center;
+  }
+
+  // 이름 스타일
+  :global(.names) {
+    font-size: 48px;
+    font-weight: 700;
+    color: $color-text-primary;
+    letter-spacing: 0.25em;
+    line-height: 180%;
   }
 }
 
@@ -169,8 +187,6 @@ $container-max-width: 768px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  animation: imageReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
   position: relative;
 
   display: flex;
@@ -179,11 +195,20 @@ $container-max-width: 768px;
   align-items: center;
   padding: 150px 0;
 
+  // fadeIn 클래스가 추가되면 애니메이션 시작
+  .fadeIn & {
+    animation: imageReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0s both;
+  }
+
   .title {
     font-size: 60px;
     letter-spacing: 12px;
     opacity: 0;
-    animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.6s forwards;
+    
+    // fadeIn 클래스가 추가되면 애니메이션 시작
+    .fadeIn & {
+      animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards;
+    }
   }
 
   .invitationContent {
@@ -201,12 +226,22 @@ $container-max-width: 768px;
 
       .textLine {
         opacity: 0;
-        animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        
+        // fadeIn 클래스가 추가되면 애니메이션 시작
+        .fadeIn & {
+          animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        &.mb {
+          margin-bottom: 24px;
+        }
 
         // 각 라인별 순차적인 딜레이 (0.1s 간격으로 부드럽게)
         @for $i from 1 through 10 {
           &:nth-child(#{$i}) {
-            animation-delay: #{2.0s + ($i - 1) * 0.1s};
+            .fadeIn & {
+              animation-delay: #{1.2s + ($i - 1) * 0.1s};
+            }
           }
         }
       }
@@ -225,13 +260,20 @@ $container-max-width: 768px;
 
     .textLine {
       opacity: 0;
-      animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      
+      .fadeIn & {
+        animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
 
       &:nth-child(1) {
-        animation-delay: 2.7s;
+        .fadeIn & {
+          animation-delay: 1.9s;
+        }
       }
       &:nth-child(2) {
-        animation-delay: 2.8s;
+        .fadeIn & {
+          animation-delay: 2.0s;
+        }
       }
     }
   }
@@ -246,13 +288,20 @@ $container-max-width: 768px;
 
     .textLine {
       opacity: 0;
-      animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      
+      .fadeIn & {
+        animation: fadeInDown 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
 
       &:nth-child(1) {
-        animation-delay: 2.9s;
+        .fadeIn & {
+          animation-delay: 2.1s;
+        }
       }
       &:nth-child(2) {
-        animation-delay: 3.0s;
+        .fadeIn & {
+          animation-delay: 2.2s;
+        }
       }
     }
   }
@@ -293,7 +342,7 @@ $container-max-width: 768px;
 
   // Mobile responsive (~ 768px)
   @media (max-width: 768px) {
-    padding: 150px 0 100px;
+    padding: 160px 0 130px;
 
     .title {
       font-size: 30px;
@@ -599,6 +648,289 @@ $container-max-width: 768px;
 // ============================================
 // Account Section
 // ============================================
+
+.gallerySection {
+  margin-bottom: $space-3xl;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.sliderContainer {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto $space-md;
+  overflow: hidden;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+}
+
+.sliderWrapper {
+  width: 100%;
+  overflow: hidden;
+  border-radius: $radius-lg;
+  touch-action: pan-x; // 가로 스와이프만 허용
+  user-select: none; // 텍스트 선택 방지
+}
+
+.sliderTrack {
+  display: flex;
+  transition: transform 0.5s $ease-smooth;
+}
+
+.sliderItem {
+  min-width: 100%;
+  cursor: pointer;
+  position: relative;
+  aspect-ratio: 3/2;
+  overflow: hidden;
+}
+
+.sliderImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s $ease-smooth;
+}
+
+.sliderButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(white, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-primary;
+  z-index: 10;
+  transition: all $transition-base;
+  box-shadow: $shadow-md;
+
+  &:hover {
+    background: white;
+    box-shadow: $shadow-lg;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &.sliderButtonPrev {
+    left: $space-sm;
+  }
+
+  &.sliderButtonNext {
+    right: $space-sm;
+  }
+}
+
+.sliderIndicators {
+  display: flex;
+  gap: $space-xs;
+  justify-content: center;
+  padding: $space-sm 0;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba($color-text-secondary, 0.3);
+  cursor: pointer;
+  transition: all $transition-base;
+  padding: 0;
+
+  &:hover {
+    background: rgba($color-text-secondary, 0.5);
+    transform: scale(1.2);
+  }
+
+  &.indicatorActive {
+    background: $color-golden;
+    width: 28px;
+    border-radius: 5px;
+  }
+}
+
+// ============================================
+// Modal Styles
+// ============================================
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-text-primary, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+  padding: $space-md;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.3s $ease-smooth;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modalImageWrapper {
+  max-width: 100%;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-x; // 가로 스와이프만 허용
+  user-select: none; // 텍스트 선택 방지
+}
+
+.modalImage {
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: $radius-md;
+  box-shadow: 0 10px 50px rgba(black, 0.5);
+}
+
+.modalClose {
+  position: absolute;
+  top: -60px;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  background: rgba(white, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(white, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all $transition-base;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(white, 0.3);
+    border-color: rgba(white, 0.5);
+    transform: rotate(90deg) scale(1.1);
+  }
+}
+
+.modalButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  background: rgba(white, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(white, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all $transition-base;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(white, 0.3);
+    border-color: rgba(white, 0.5);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &.modalButtonPrev {
+    left: -80px;
+  }
+
+  &.modalButtonNext {
+    right: -80px;
+  }
+}
+
+.modalIndicators {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: $space-xs;
+}
+
+@media (max-width: 768px) {
+  .sliderButton {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .modalClose {
+    top: -50px;
+    width: 40px;
+    height: 40px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .modalButton {
+    width: 44px;
+    height: 44px;
+
+    &.modalButtonPrev {
+      left: -10px;
+    }
+
+    &.modalButtonNext {
+      right: -10px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .modalIndicators {
+    bottom: -40px;
+  }
+}
 
 .accountContainer {
   display: flex;

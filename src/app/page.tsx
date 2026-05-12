@@ -1,71 +1,47 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import loadingImg from "~/assets/images/loading.png";
+import { useEffect, useState } from "react";
+import Typewriter from "typewriter-effect";
 import styles from "./styles/page.module.scss";
-
-// 카카오맵 타입 선언
-type KakaoLatLng = {
-  getLat: () => number;
-  getLng: () => number;
-};
-
-type KakaoMap = {
-  setCenter: (latlng: KakaoLatLng) => void;
-};
-
-type KakaoMarker = {
-  setPosition: (latlng: KakaoLatLng) => void;
-};
-
-type KakaoInfoWindow = {
-  open: (map: KakaoMap, marker: KakaoMarker) => void;
-};
-
-declare global {
-  interface Window {
-    kakao: {
-      maps: {
-        load: (callback: () => void) => void;
-        LatLng: new (lat: number, lng: number) => KakaoLatLng;
-        Map: new (
-          container: HTMLElement,
-          options: { center: KakaoLatLng; level: number },
-        ) => KakaoMap;
-        Marker: new (options: { position: KakaoLatLng; map: KakaoMap }) => KakaoMarker;
-        InfoWindow: new (options: { content: string }) => KakaoInfoWindow;
-      };
-    };
-  }
-}
 
 export default function Main() {
   const [loading, setLoading] = useState(true);
+  const [loadingFadeOut, setLoadingFadeOut] = useState(false);
   const [openAccount, setOpenAccount] = useState<"groom" | "bride" | null>(null);
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
-  useEffect(() => {
-    // 1.5초 후 로딩 완료
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+  // 터치 스와이프 관련 state
+  const [touchStart, setTouchStart] = useState<number>(0);
+  const [touchEnd, setTouchEnd] = useState<number>(0);
+  const [touchStartY, setTouchStartY] = useState<number>(0);
 
-    return () => clearTimeout(timer);
-  }, []);
+  // 갤러리 이미지 배열 (실제 이미지 경로로 변경 필요)
+  const galleryImages = [
+    "/assets/images/gallery/1.jpg",
+    "/assets/images/gallery/2.jpg",
+    "/assets/images/gallery/3.jpg",
+    "/assets/images/gallery/4.jpg",
+    "/assets/images/gallery/5.jpg",
+    "/assets/images/gallery/6.jpg",
+  ];
+
+  // 타이핑 효과가 완료되면 로딩 화면 제거
+  const handleTypingComplete = () => {
+    // 타이핑 완료 후 약간의 딜레이를 주고 페이드아웃 시작
+    setTimeout(() => {
+      setLoadingFadeOut(true);
+      // fadeOut 애니메이션이 끝난 후 로딩 상태 해제
+      setTimeout(() => {
+        setLoading(false);
+      }, 600); // fadeOut 애니메이션 시간
+    }, 1000);
+  };
 
   const accounts = [
-    {
-      bank: "농협",
-      number: "455-01-133558",
-      holder: "박양열",
-    },
-    {
-      bank: "농협",
-      number: "455-12-266333",
-      holder: "강현숙",
-    },
     {
       bank: "우리은행",
       number: "1002-736-448724",
@@ -87,58 +63,166 @@ export default function Main() {
     }
   };
 
-  // 카카오맵 로드 및 렌더링
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleImageClick = (index: number) => {
+    return;
+    setSelectedImage(index);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleModalPrev = () => {
+    setSelectedImage((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const handleModalNext = () => {
+    setSelectedImage((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+  };
+
+  // 터치 스와이프 핸들러 (슬라이더용)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const currentX = e.targetTouches[0].clientX;
+    const currentY = e.targetTouches[0].clientY;
+
+    setTouchEnd(currentX);
+
+    // 가로 스와이프가 세로 스크롤보다 크면 기본 스크롤 방지
+    const diffX = Math.abs(currentX - touchStart);
+    const diffY = Math.abs(currentY - touchStartY);
+
+    if (diffX > diffY && diffX > 10) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50; // 최소 스와이프 거리 (px)
+
+    if (Math.abs(distance) < minSwipeDistance) return;
+
+    if (distance > 0) {
+      // 왼쪽으로 스와이프 (다음 이미지)
+      handleNextSlide();
+    } else {
+      // 오른쪽으로 스와이프 (이전 이미지)
+      handlePrevSlide();
+    }
+
+    // 초기화
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  // 터치 스와이프 핸들러 (모달용)
+  const handleModalTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
+  };
+
+  const handleModalTouchMove = (e: React.TouchEvent) => {
+    const currentX = e.targetTouches[0].clientX;
+    const currentY = e.targetTouches[0].clientY;
+
+    setTouchEnd(currentX);
+
+    // 가로 스와이프가 세로 스크롤보다 크면 기본 스크롤 방지
+    const diffX = Math.abs(currentX - touchStart);
+    const diffY = Math.abs(currentY - touchStartY);
+
+    if (diffX > diffY && diffX > 10) {
+      e.preventDefault();
+    }
+  };
+
+  const handleModalTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+
+    if (Math.abs(distance) < minSwipeDistance) return;
+
+    if (distance > 0) {
+      handleModalNext();
+    } else {
+      handleModalPrev();
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  // 모달이 열렸을 때 스크롤 방지 및 위치 유지
   useEffect(() => {
-    if (loading) return;
+    if (isModalOpen) {
+      // 현재 스크롤 위치 저장
+      const scrollY = window.scrollY;
 
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=c29b445938b8cb6fa9b0e1d01d12da98&autoload=false`;
-    script.async = true;
+      // body를 fixed로 설정하여 스크롤 위치 유지
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
 
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        if (!mapRef.current) return;
+      return () => {
+        // 원래 상태로 복원
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
 
-        const position = new window.kakao.maps.LatLng(36.7783897, 126.4565724);
-        const options = {
-          center: position,
-          level: 4,
-        };
-
-        const map = new window.kakao.maps.Map(mapRef.current, options);
-
-        new window.kakao.maps.Marker({
-          position: position,
-          map: map,
-        });
-
-        map.setCenter(position);
-      });
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, [loading]);
+        // 저장했던 스크롤 위치로 복원
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isModalOpen]);
 
   return (
     <>
       {/* 로딩 화면 */}
       {loading && (
-        <div className={styles.loadingScreen}>
+        <div className={`${styles.loadingScreen} ${loadingFadeOut ? styles.fadeOut : ""}`}>
           <div className={styles.loadingContent}>
-            <Image
-              src={loadingImg}
-              alt="Loading"
-              width={96}
-              height={96}
-              className={styles.loadingImage}
-              priority
-            />
+            <div className={styles.typewriterText}>
+              <Typewriter
+                onInit={(typewriter) => {
+                  typewriter
+                    .typeString('<span class="names">박중호</span>')
+                    .pauseFor(200)
+                    .typeString('<br/><span class="names">')
+                    .typeString("&")
+                    .typeString("</span><br/>")
+                    .pauseFor(200)
+                    .typeString('<span class="names">이예림</span>')
+                    .pauseFor(500)
+                    .callFunction(() => {
+                      handleTypingComplete();
+                    })
+                    .start();
+                }}
+                options={{
+                  delay: 80,
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -151,11 +235,12 @@ export default function Main() {
             <div className={styles.invitationContent}>
               <div className={styles.invitationMessage}>
                 <div className={styles.textLine}>화려한 예식 대신 가족들과의 소중한 식사로</div>
-                <div className={styles.textLine}>부부로서의 첫걸음을 내딛기로 하였습니다.</div>
-                <div className={styles.textLine}>직접 모시지 못한 송구한 마음을 담아</div>
-                <div className={styles.textLine}>따로 정성껏 식사 자리를 준비했사오니,</div>
-                <div className={styles.textLine}>귀한 걸음 하시어 저희의 시작을 격려해 주시면</div>
-                <div className={styles.textLine}>더할 나위 없는 기쁨이겠습니다.</div>
+                <div className={`${styles.textLine} ${styles.mb}`}>
+                  부부로서의 첫걸음을 내딛기로 하였습니다.
+                </div>
+                <div className={styles.textLine}>격식은 생략하지만 마음만은 깊이 담아</div>
+                <div className={styles.textLine}>감사의 인사를 올립니다.</div>
+                <div className={styles.textLine}>보내주시는 따뜻한 격려 잊지 않겠습니다.</div>
               </div>
               <div className={styles.invitationMessage}></div>
             </div>
@@ -168,30 +253,105 @@ export default function Main() {
               </div>
             </div>
             <div className={styles.date}>
-              <div className={styles.textLine}>2026년 5월 2일 토요일 오전 11시 30분</div>
-              <div className={styles.textLine}>장소: 쿠우쿠우</div>
+              <div className={styles.textLine}>2026년 9월 26일 토요일 오전 11시 30분</div>
             </div>
           </div>
           <div className={styles.footer}>
             <div className={styles.footerContent}>
-              {/* 오시는 길 섹션 */}
-              <section className={styles.locationSection}>
-                <h2 className={styles.footerTitle}>오시는 길</h2>
-                <div className={styles.locationInfo}>
-                  <p className={styles.locationAddress}>
-                    <strong>충남 서산시 안견로 242 2층 디퍼아울렛타운 2층</strong>
-                    쿠우쿠우
-                  </p>
+              {/* 갤러리 슬라이더 섹션 */}
+              <section className={styles.gallerySection}>
+                <h2 className={styles.footerTitle}>우리의 순간들</h2>
+                <div className={styles.sliderContainer}>
+                  <button
+                    className={`${styles.sliderButton} ${styles.sliderButtonPrev}`}
+                    onClick={handlePrevSlide}
+                    aria-label="이전 이미지"
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 18L9 12L15 6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <div
+                    className={styles.sliderWrapper}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    <div
+                      className={styles.sliderTrack}
+                      style={{
+                        transform: `translateX(-${currentSlide * 100}%)`,
+                      }}
+                    >
+                      {galleryImages.map((image, index) => (
+                        <div
+                          key={index}
+                          className={styles.sliderItem}
+                          onClick={() => handleImageClick(index)}
+                        >
+                          <Image
+                            src={image}
+                            alt={`갤러리 이미지 ${index + 1}`}
+                            width={600}
+                            height={400}
+                            className={styles.sliderImage}
+                            priority={index === 0}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    className={`${styles.sliderButton} ${styles.sliderButtonNext}`}
+                    onClick={handleNextSlide}
+                    aria-label="다음 이미지"
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 18L15 12L9 6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
                 </div>
 
-                {/* 카카오 맵 */}
-                <div className={styles.mapContainer}>
-                  <div ref={mapRef} />
+                {/* 슬라이더 인디케이터 */}
+                <div className={styles.sliderIndicators}>
+                  {galleryImages.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.indicator} ${
+                        index === currentSlide ? styles.indicatorActive : ""
+                      }`}
+                      onClick={() => setCurrentSlide(index)}
+                      aria-label={`${index + 1}번 이미지로 이동`}
+                    />
+                  ))}
                 </div>
               </section>
-
-              {/* 구분선 */}
-              <div className={styles.divider} />
 
               {/* 마음 전하실 곳 섹션 */}
               <section className={styles.accountSection}>
@@ -314,6 +474,105 @@ export default function Main() {
             </div>
           </div>
         </main>
+
+        {/* 이미지 모달 */}
+        {isModalOpen && (
+          <div className={styles.modal} onClick={handleCloseModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.modalClose} onClick={handleCloseModal} aria-label="닫기">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <button
+                className={`${styles.modalButton} ${styles.modalButtonPrev}`}
+                onClick={handleModalPrev}
+                aria-label="이전 이미지"
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <div
+                className={styles.modalImageWrapper}
+                onTouchStart={handleModalTouchStart}
+                onTouchMove={handleModalTouchMove}
+                onTouchEnd={handleModalTouchEnd}
+              >
+                <Image
+                  src={galleryImages[selectedImage]}
+                  alt={`갤러리 이미지 ${selectedImage + 1}`}
+                  width={1200}
+                  height={800}
+                  className={styles.modalImage}
+                  priority
+                />
+              </div>
+
+              <button
+                className={`${styles.modalButton} ${styles.modalButtonNext}`}
+                onClick={handleModalNext}
+                aria-label="다음 이미지"
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* 모달 인디케이터 */}
+              <div className={styles.modalIndicators}>
+                {galleryImages.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`${styles.indicator} ${
+                      index === selectedImage ? styles.indicatorActive : ""
+                    }`}
+                    onClick={() => setSelectedImage(index)}
+                    aria-label={`${index + 1}번 이미지로 이동`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
