@@ -21,12 +21,12 @@ export default function Main() {
 
   // 갤러리 이미지 배열 (실제 이미지 경로로 변경 필요)
   const galleryImages = [
-    "/assets/images/gallery/1.jpg",
-    "/assets/images/gallery/2.jpg",
-    "/assets/images/gallery/3.jpg",
-    "/assets/images/gallery/4.jpg",
-    "/assets/images/gallery/5.jpg",
-    "/assets/images/gallery/6.jpg",
+    "./assets/images/gallery/1.jpg",
+    "./assets/images/gallery/2.jpg",
+    "./assets/images/gallery/3.jpg",
+    "./assets/images/gallery/4.jpg",
+    "./assets/images/gallery/5.jpg",
+    "./assets/images/gallery/6.jpg",
   ];
 
   // 타이핑 효과가 완료되면 로딩 화면 제거
